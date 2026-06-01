@@ -50,7 +50,7 @@ class Rules:
     def __init__(self):
         self.rules = {
             "incidents": {
-                "упал",
+                "упа",
                 "ошибк",
                 "сбо",
                 "срочн",
