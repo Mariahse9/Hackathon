@@ -1,6 +1,5 @@
 import re
 from pathlib import Path
-
 import nltk
 from nltk.stem.snowball import SnowballStemmer
 from razdel import tokenize
@@ -109,38 +108,39 @@ class Rules:
             },
         }
 
+    
     def classify(self, email):
         if not email.is_good or not email.content:
             return "unclassified"
 
         errors_re = re.compile(r"(код ошибки|код):?\s*(err_\d+|[45]0\d)")
-        if errors_re.search(email.content):
-            return "errors"
+        is_error = bool(errors_re.search(email.content))
 
         monitor_re = re.compile(r"alert|healthcheck|error_log\.txt")
         stems = email.textpreprocessing()
 
         if monitor_re.search(email.content):
-            return "alerts"
+            category = "alerts"
+        elif (re.compile(r"http[s]?://\S+").search(email.content) or self.rules["spam"].intersection(stems)):
+            category = "spam"
+        elif self.rules["security_alerts"].intersection(stems):
+            category = "security_alerts"
+        else:
+            scores = {}
+            for cat, keywords in self.rules.items():
+                score = sum(1 for stem in stems if stem in keywords)
+                scores[cat] = score
+            
+            category_current = max(scores, key=scores.get)
+            category = category_current if scores[category_current] > 0 else "unsorted"
 
-        url_re = re.compile(r"http[s]?://\S+")
+        if is_error:
+            if category == "unsorted":
+                return "errors"
+            else:
+                return f"errors/{category}"
 
-        if url_re.search(email.content) or self.rules["spam"].intersection(stems):
-            return "spam"
-
-        if self.rules["security_alerts"].intersection(stems):
-            return "security_alerts"
-
-        scores = {}
-
-        for category, keywords in self.rules.items():
-            score = sum(1 for stem in stems if stem in keywords)
-            scores[category] = score
-        category_current = max(scores, key=scores.get)
-        if scores[category_current] > 0:
-            return category_current
-
-        return "unsorted"
+        return category
 
 
 class FileCEO:
