@@ -1,5 +1,5 @@
 import pytest
-from hackaton.version import Rules
+from hackaton.version import Rules, EmailReceiver
 
 @pytest.mark.parametrize(
     "text, expected",
@@ -9,8 +9,10 @@ from hackaton.version import Rules
         ("Ваш аккаунт заблокирован", "security_alerts"),
         ("Счет на оплату", "finance_and_docs"),
         ("Назначена встреча", "meetings"),
+        ("Нет доступа", "access_and_hr"),
     ],
 )
+
 def test_categories(create_email, text, expected):
     email = create_email(text)
     rules = Rules()
@@ -25,3 +27,20 @@ def test_error(create_email):
     email = create_email("Код ошибки ERR_500")
     rules = Rules()
     assert rules.classify(email).startswith("errors")
+
+def test_alerts(create_email):
+    email = create_email("Alert сервер недоступен")
+    rules = Rules()
+    assert rules.classify(email) == "alerts"
+
+def test_unclassified_binary_file(tmp_path):
+    file = tmp_path / "virus.exe"
+    file.write_text("bad")
+    email = EmailReceiver(file)
+    rules = Rules()
+    assert rules.classify(email) == "unclassified"
+
+def test_logs_info(create_email):
+    email = create_email("error_log.txt")
+    rules = Rules()
+    assert rules.classify(email) == "logs_info"
