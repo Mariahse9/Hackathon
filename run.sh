@@ -24,7 +24,7 @@ else
 fi
 
 setup() {
-    echo "Установка зависимостей..."
+    echo "[LOADING] Установка зависимостей..."
 
     if command -v uv >/dev/null 2>&1; then
         uv pip install -r "$PROJECT_DIR/requirements.txt"
@@ -32,15 +32,15 @@ setup() {
         "$PYTHON" -m pip install -r "$PROJECT_DIR/requirements.txt"
     fi
 
-    echo "Зависимости установлены"
+    echo "[OK] Зависимости установлены"
 }
 
 run_program() {
-    echo "Запуск программы..."
+    echo "[LOADING] Запуск программы..."
 
     if [ ! -d "$INBOX_DIR" ]; then
-        echo "Ошибка: папка data/inbox не найдена"
-        echo "Создай папку data/inbox и положи туда письма"
+        echo "[ERROR] Папка data/inbox не найдена"
+        echo "[OK] Создай папку data/inbox и положи туда письма"
         exit 1
     fi
 
@@ -49,11 +49,11 @@ run_program() {
     cd "$PROJECT_DIR"
     $PYTHON_RUN "$PROGRAM_FILE"
 
-    echo "Программа завершила работу"
+    echo "[OK] Программа завершила работу"
 }
 
 clean_outbox() {
-    echo "Возвращаем письма из data/outbox обратно в data/inbox..."
+    echo "[LOADING] Возвращаем письма из data/outbox обратно в data/inbox..."
 
     mkdir -p "$INBOX_DIR"
 
@@ -77,26 +77,26 @@ clean_outbox() {
         done
     fi
 
-    echo "Очищаем папку data/outbox..."
+    echo "[LOADING] Очищаем папку data/outbox..."
 
     rm -rf "$OUTBOX_DIR"
     mkdir -p "$OUTBOX_DIR"
 
-    echo "Готово: письма возвращены в inbox, outbox очищен"
+    echo "[OK] Письма возвращены в inbox, outbox очищен"
 }
 
 run_tests() {
-    echo "Запуск тестов..."
+    echo "[LOADING] Запуск тестов..."
 
     if [ ! -d "$TESTS_DIR" ]; then
-        echo "Папка tests пока не создана"
+        echo "[ERROR] Папка tests пока не создана"
         exit 1
     fi
 
     cd "$PROJECT_DIR"
     $PYTEST_RUN "$TESTS_DIR" -q
 
-    echo "Тесты успешно пройдены"
+    echo "[OK] Тесты успешно пройдены"
 }
 
 case "$1" in
@@ -118,7 +118,7 @@ case "$1" in
         run_program
         ;;
     *)
-        echo "Использование:"
+        echo "[HELP] Использование:"
         echo "./run.sh setup   - установить зависимости"
         echo "./run.sh run     - запустить программу"
         echo "./run.sh clean   - очистить data/outbox"
