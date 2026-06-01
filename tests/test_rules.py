@@ -22,6 +22,6 @@ def test_unsorted(create_email):
     assert rules.classify(email) == "unsorted"
 
 def test_error(create_email):
-    email = create_email("Ошибка")
+    email = create_email("Код ошибки ERR_500")
     rules = Rules()
     assert rules.classify(email).startswith("errors")
