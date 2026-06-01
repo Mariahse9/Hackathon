@@ -108,7 +108,6 @@ class Rules:
             },
         }
 
-    
     def classify(self, email):
         if not email.is_good or not email.content:
             return "unclassified"
@@ -120,7 +119,11 @@ class Rules:
         stems = email.textpreprocessing()
 
         if monitor_re.search(email.content):
-            category = "alerts"
+            is_incident = bool(self.rules["incidents"].intersection(stems))
+            if "error_log.txt" in email.content and not is_incident:
+                category = "logs_info"
+            else:
+                category = "alerts"
         elif (re.compile(r"http[s]?://\S+").search(email.content) or self.rules["spam"].intersection(stems)):
             category = "spam"
         elif self.rules["security_alerts"].intersection(stems):
