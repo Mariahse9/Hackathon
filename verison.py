@@ -1,6 +1,5 @@
 import re
 from pathlib import Path
-import nltk
 from nltk.stem.snowball import SnowballStemmer
 from razdel import tokenize
 
@@ -163,7 +162,7 @@ class FileCEO:
 
 
 def main():
-    base_dir = Path(__file__).parent.parent
+    base_dir = Path(__file__).parent
     inbox = base_dir / "data" / "inbox"
     outbox = base_dir / "data" / "outbox"
 
