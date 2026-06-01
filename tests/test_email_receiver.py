@@ -1,4 +1,4 @@
-from hackaton.version import EmailReceiver
+from verison import EmailReceiver
 
 def test_read_valid_text_file(tmp_path):
     file = tmp_path / "mail.txt"

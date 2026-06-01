@@ -1,5 +1,5 @@
 import pytest
-from hackaton.version import Rules, EmailReceiver
+from verison import Rules, EmailReceiver
 
 @pytest.mark.parametrize(
     "text, expected",
